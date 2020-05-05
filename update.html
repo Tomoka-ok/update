@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>更新</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light p_girls">
+        <a class="navbar-brand" href="#">P-GIRLS <br> 商品管理アプリ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="registration.html">登録</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="s2.html">検索</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="update.html">更新</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend ">
+                <span class=" " id="inputGroup-sizing-default">商品名</span>
+            </div>
+            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+                id="newName">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend ">
+                <span class="  " id="inputGroup-sizing-default">在庫数</span>
+            </div>
+            <input type="number" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+                id="newStock">
+        </div>
+    </div>
+
+    <div class="container">
+        <button type="button" id="update_btn" class="btn btn-secondary float-right">更新</button>
+    </div>
+
+    <div class="float-right update" id="update_text"></div>
+
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+
+    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="/__/firebase/6.2.0/firebase-app.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="/__/firebase/6.2.0/firebase-auth.js"></script>
+    <script src="/__/firebase/6.2.0/firebase-firestore.js"></script>
+    <!-- Initialize Firebase -->
+    <script src="/__/firebase/init.js"></script>
+
+
+
+    <!-- 更新しましたを表示するコード -->
+    <script>
+        document.getElementById('update_btn').addEventListener('click', function () {
+            var update_text = document.getElementById('update_text');
+            console.log(update_text);
+
+            while (update_text.lastChild) {
+                update_text.removeChild(update_text.lastChild);
+            }
+
+            console.log('update_btn was pressed.');
+
+            var update = document.createElement('div');
+            update.innerHTML = "更新が完了しました。"
+
+            update_text.appendChild(update);
+
+
+        }, false);
+    </script>
+
+
+    <!-- 新しいコード -->
+    <script>
+        // ＊firestoreとは？
+        var db = firebase.firestore();
+
+        // *変更するコレクションは「product」ということを明示
+        var collectionName = 'product';
+
+        // 検索からのid・商品名・在庫数を格納する変数を作成
+        var docId, inputName, inputStock;
+
+        // ＊ドキュメント（product)はコレクションの中にある
+        // Ref(=リファレンス)はデータベース内の場所を指すオブジェクト
+        // ＊下記のコードはコレクション内のドキュメント(product)の場所を指している？
+        // *.docって何？
+        var productRef = db.collection(collectionName).doc;
+
+        // ここから検索のデータの取得
+        // URLオブジェクトを　document.location　から取得
+        // URLオブジェクトの searchParams にアクセス
+        var params = (new URL(document.location)).searchParams;
+
+        // idの取得
+        // parseInt()は文字列を整数に変換するジャバスクリプトのグローバル関数（＝プログラムのどこからでもアクセスできて、使用可能）
+        var product_id = parseInt(params.get('id'));
+        console.log("id：", product_id);
+
+        // nameの取得
+        var product_name = params.get('name');
+        console.log("name：", product_name);
+
+        // stockの取得
+        var product_stock = params.get('stock');
+        console.log("stock：", product_stock);
+
+        // ＊コレクション("product")の中で、idがproduct_id(検索で指定されたid)と同じものを返す
+        db.collection(collectionName).where("id", "==", product_id)
+            // ＊get()関数を使ってスナップショット(=上で返されたもの)を取得
+            .get()
+            // ＊ここから下はコレクションから複数のドキュメントを取得する方法
+            // ＊then()は「その時〜をする」みたいな関数？
+            .then(function (querySnapshot) {
+                // querySnapshotは複数のドキュメントのデータを持つスナップショット
+                // forEachって何？
+                querySnapshot.forEach(doc => {
+                    // 検索から取ってきた値を変数に格納
+                    // *date()はスナップショットからデータを得る
+                    docId = doc.id;
+                    inputName = doc.data().name;
+                    inputStock = doc.data().stock;
+                    console.log(inputName);
+                    console.log(inputStock);
+                    console.log(doc.data());
+                });
+            })
+
+
+        // ここからデータの更新
+        // 更新ボタンが押された時
+        document.getElementById('update_btn').addEventListener('click', function () {
+            // 入力されたデータの取得
+            var new_name, new_stock;
+            new_name = document.getElementById("newName").value;
+            new_stock = document.getElementById("newStock").value;
+            // ちゃんとデータが入力されているかチェック
+            console.log(new_name);
+            console.log(new_stock);
+
+            db.collection("product").doc("docId").update({
+                //更新するデータ
+                // ここには入力された値を入れる
+                name: new_name,
+                stock: new_stock
+            })
+                .then(function () {
+                    console.log("Document successfully updated!");
+                })
+                .catch(function (error) {
+                    // The document probably doesn't exist.
+                });
+
+        }, false);
+
+    </script>
+
+
+
+
+</body>
+
+</html>
